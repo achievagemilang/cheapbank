@@ -1,35 +1,28 @@
 package db
 
 import (
-	"database/sql"
+	"context"
 	"log"
 	"os"
 	"testing"
 
-	_ "github.com/lib/pq"
+	"github.com/achievagemilang/cheapbank/util"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-var testQueries *Queries
-var testDB *sql.DB
+var testStore Store
 
-const (
-	dbDriver = "postgres"
-	dbSource = "postgresql://postgres:postgres@localhost:54320/cheapbank?sslmode=disable"
-)
-
-func TestMain(m *testing.M) {  
-	var err error
-	testDB, err = sql.Open(dbDriver, dbSource)
+func TestMain(m *testing.M) {
+	config, err := util.LoadConfig("../..")
 	if err != nil {
-		log.Fatal("cannot connect to db: ", err)
+		log.Fatal("cannot load config:", err)
 	}
 
-	testQueries = New(testDB)
-	
-	code := m.Run()
-	
-	testDB.Close()  
-	os.Exit(code)
+	connPool, err := pgxpool.New(context.Background(), config.DBSource)
+	if err != nil {
+		log.Fatal("cannot connect to db:", err)
+	}
+
+	testStore = NewStore(connPool)
+	os.Exit(m.Run())
 }
-
-
