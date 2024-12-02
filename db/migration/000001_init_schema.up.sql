@@ -1,26 +1,28 @@
 CREATE TYPE Currency AS ENUM (
   'USD',
-  'EUR'
+  'EUR',
+  'CAD'
 );
 
 CREATE TABLE "accounts" (
   "id" bigserial PRIMARY KEY,
   "owner" varchar NOT NULL,
-  "balance" bigint NOT NULL,
+  "balance" DOUBLE PRECISION NOT NULL,
   "currency" Currency NOT NULL,
   "created_at" timestamptz DEFAULT (now())
 );
 
 CREATE TABLE "entries" (
   "id" bigserial PRIMARY KEY,
-  "amount" bigint NOT NULL,
+  "amount" DOUBLE PRECISION  NOT NULL,
   "account_id" bigint NOT NULL,
+  "currency" Currency NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "transfers" (
   "id" bigserial PRIMARY KEY,
-  "amount" bigint NOT NULL,
+  "amount" DOUBLE PRECISION  NOT NULL,
   "currency" Currency NOT NULL,
   "from_acc_id" bigint NOT NULL,
   "to_acc_id" bigint NOT NULL,

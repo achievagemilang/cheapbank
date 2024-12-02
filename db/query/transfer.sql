@@ -1,4 +1,4 @@
--- CreateTransfer :one
+-- name: CreateTransfer :one
 INSERT INTO transfers (
     from_acc_id,
     to_acc_id,
