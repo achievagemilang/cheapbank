@@ -9,6 +9,46 @@ import (
 	"context"
 )
 
+const createTransfer = `-- name: CreateTransfer :one
+INSERT INTO transfers (
+    from_acc_id,
+    to_acc_id,
+    amount,
+    currency
+) VALUES (
+    $1,
+    $2,
+    $3,
+    $4
+) RETURNING id, amount, currency, from_acc_id, to_acc_id, created_at
+`
+
+type CreateTransferParams struct {
+	FromAccID int64    `json:"from_acc_id"`
+	ToAccID   int64    `json:"to_acc_id"`
+	Amount    float64  `json:"amount"`
+	Currency  Currency `json:"currency"`
+}
+
+func (q *Queries) CreateTransfer(ctx context.Context, arg CreateTransferParams) (Transfer, error) {
+	row := q.db.QueryRowContext(ctx, createTransfer,
+		arg.FromAccID,
+		arg.ToAccID,
+		arg.Amount,
+		arg.Currency,
+	)
+	var i Transfer
+	err := row.Scan(
+		&i.ID,
+		&i.Amount,
+		&i.Currency,
+		&i.FromAccID,
+		&i.ToAccID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getTransfer = `-- name: GetTransfer :one
 SELECT id, amount, currency, from_acc_id, to_acc_id, created_at FROM transfers 
 WHERE id = $1

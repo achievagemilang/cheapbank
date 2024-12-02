@@ -16,6 +16,7 @@ type Currency string
 const (
 	CurrencyUSD Currency = "USD"
 	CurrencyEUR Currency = "EUR"
+	CurrencyCAD Currency = "CAD"
 )
 
 func (e *Currency) Scan(src interface{}) error {
@@ -56,7 +57,7 @@ func (ns NullCurrency) Value() (driver.Value, error) {
 type Account struct {
 	ID        int64        `json:"id"`
 	Owner     string       `json:"owner"`
-	Balance   int64        `json:"balance"`
+	Balance   float64      `json:"balance"`
 	Currency  Currency     `json:"currency"`
 	CreatedAt sql.NullTime `json:"created_at"`
 }
@@ -64,15 +65,16 @@ type Account struct {
 type Entry struct {
 	ID int64 `json:"id"`
 	// can be positive/negative
-	Amount    int64     `json:"amount"`
+	Amount    float64   `json:"amount"`
 	AccountID int64     `json:"account_id"`
+	Currency  Currency  `json:"currency"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
 type Transfer struct {
 	ID int64 `json:"id"`
 	// must be positive
-	Amount    int64        `json:"amount"`
+	Amount    float64      `json:"amount"`
 	Currency  Currency     `json:"currency"`
 	FromAccID int64        `json:"from_acc_id"`
 	ToAccID   int64        `json:"to_acc_id"`
